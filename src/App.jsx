@@ -1,15 +1,12 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Home from "../pages/Home";
-import './style.sass';
+import Login from "../pages/Login";
+import Register from "../pages/Register";
+import './style.scss';
 
 function App() {
   return (
     <div>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Home/>} exact/>
-        </Routes>
-      </BrowserRouter>
+      <Home />
     </div>
   )
 }
