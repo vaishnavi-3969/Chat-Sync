@@ -1,10 +1,55 @@
 import React from 'react'
+import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth'
+import { auth, storage,db } from '../src/firebase'
+import { doc, setDoc } from "firebase/firestore";
+import {
+    ref,
+    uploadBytesResumable,
+    getDownloadURL
+} from 'firebase/storage'
 
 const Register = () => {
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault()
-        console.log(e.target[0].value)
+        const displayName = e.target[0].value;
+        const email = e.target[1].value;
+        const password = e.target[2].value;
+        const file = e.target[3].files[0];
+
+        try {
+            const response = await createUserWithEmailAndPassword(auth, email, password)
+
+            console.log(response)
+
+            const storageRef = ref(storage, displayName);
+            const uploadTask = uploadBytesResumable(storageRef, file);
+            uploadTask.on(
+
+                (error) => {
+                    console.log(error)
+                },
+                () => {
+                    getDownloadURL(uploadTask.snapshot.ref).then(async (downloadURL) => {
+                        console.log('File available at', downloadURL);
+                        await updateProfile(response.user, {
+                            displayName,
+                            photoURL: downloadURL
+                        });
+                        await setDoc(doc(db, "chat_users",response.user.uid),{
+                            uid:response.user.uid,
+                            displayName,
+                            email,
+                            photoURL: downloadURL
+                        })
+                    });
+                }
+            );
+            
+        } catch (err) {
+            alert(err)
+        }
     }
+
     return (
         <div className='formContainer'>
             <div className='formWrapper'>
