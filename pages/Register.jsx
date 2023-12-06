@@ -1,14 +1,17 @@
 import React from 'react'
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth'
-import { auth, storage,db } from '../src/firebase'
+import { auth, storage, db } from '../src/firebase'
 import { doc, setDoc } from "firebase/firestore";
 import {
     ref,
     uploadBytesResumable,
     getDownloadURL
 } from 'firebase/storage'
+import { Link, useNavigate } from 'react-router-dom';
 
 const Register = () => {
+    const navigate = useNavigate();
+
     const handleSubmit = async (e) => {
         e.preventDefault()
         const displayName = e.target[0].value;
@@ -24,7 +27,8 @@ const Register = () => {
             const storageRef = ref(storage, displayName);
             const uploadTask = uploadBytesResumable(storageRef, file);
             uploadTask.on(
-
+                'state_changed',
+                null,
                 (error) => {
                     console.log(error)
                 },
@@ -35,16 +39,19 @@ const Register = () => {
                             displayName,
                             photoURL: downloadURL
                         });
-                        await setDoc(doc(db, "chat_users",response.user.uid),{
-                            uid:response.user.uid,
+                        await setDoc(doc(db, "chat_users", response.user.uid), {
+                            uid: response.user.uid,
                             displayName,
                             email,
                             photoURL: downloadURL
                         })
+                        // await setDoc(doc(db, "userChats", response.user.id), {})
+                        navigate('/')
                     });
+
                 }
             );
-            
+
         } catch (err) {
             alert(err)
         }
@@ -64,13 +71,14 @@ const Register = () => {
                         <i className='fas fa-upload'></i>
                         <span>Upload an avatar</span>
                     </label>
-                    <button>Sign Up</button>
+                    <button type='submit'>Sign Up</button>
                 </form>
-                <p>Don't have an account? Login</p>
+                <p>Don't have an account? <Link to="/login">Login</Link></p>
             </div>
         </div>
     )
 }
 
 export default Register
+
 
