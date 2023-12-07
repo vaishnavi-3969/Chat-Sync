@@ -39,13 +39,13 @@ const Register = () => {
                             displayName,
                             photoURL: downloadURL
                         });
-                        await setDoc(doc(db, "chat_users", response.user.uid), {
+                        await setDoc(doc(db, "users", response.user.uid), {
                             uid: response.user.uid,
                             displayName,
                             email,
                             photoURL: downloadURL
                         })
-                        // await setDoc(doc(db, "userChats", response.user.id), {})
+                        await setDoc(doc(db, "userChats", response.user.uid), {})
                         navigate('/')
                     });
 
